@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+      
+defaults:
+  run:
+    working-directory: src
 
 jobs:
   build:
@@ -20,10 +24,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v4.0.0
-      with:
-        dotnet-version: 8
+    # - name: Setup .NET Core SDK
+    #   uses: actions/setup-dotnet@v4.0.0
+    #   with:
+    #     dotnet-version: 8
 
     - name: Install NuGet Tools
       uses: NuGet/setup-nuget@v1
