@@ -36,7 +36,7 @@ jobs:
     - name: Restore Packages
       run: |
         Get-ChildItem -Path "${{ github.workspace }}" | ForEach-Object { Write-Host $_.FullName }
-        nuget restore 'src/${{ env.projectName }}.sln'
+        nuget restore '${{ env.projectName }}.sln'
 
     - name: Build Solution
       run: msbuild /t:publish /p:Configuration=Release /p:DeployOnBuild=true /p:PublishDir=${{ env.binariesDirectory }} '**/*.sln'
