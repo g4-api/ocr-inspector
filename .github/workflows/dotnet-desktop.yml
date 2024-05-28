@@ -34,7 +34,7 @@ jobs:
 
     - name: Restore Packages
       run: |
-        Write-Host ${{ github.workspace }}
+        Get-ChildItem -Path "${{ github.workspace }}" | ForEach-Object { Write-Host $_.FullName }
         nuget restore '**/*.sln'
 
     - name: Build Solution
