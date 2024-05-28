@@ -34,7 +34,7 @@ jobs:
 
     - name: Restore Packages
       run: |
-        Write-Host Get-Location
+        Write-Host (Get-Location)
         nuget restore '**/*.sln'
 
     - name: Build Solution
