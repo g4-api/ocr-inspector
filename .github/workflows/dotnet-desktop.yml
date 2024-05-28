@@ -34,8 +34,7 @@ jobs:
 
     - name: Restore Packages
       run: |
-        echo %cd%
-        cd ocr-inspector/src
+        Write-Host 'Foo Bar'
         nuget restore '**/*.sln'
 
     - name: Build Solution
