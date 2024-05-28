@@ -19,6 +19,7 @@ jobs:
       buildConfiguration: 'Release'
       artifactStagingDirectory: ${{ github.workspace }}/artifact_staging
       binariesDirectory: ${{ github.workspace }}/binaries
+      projectName: OcrInspector
 
     steps:
     - name: Checkout repository
@@ -35,7 +36,7 @@ jobs:
     - name: Restore Packages
       run: |
         Get-ChildItem -Path "${{ github.workspace }}" | ForEach-Object { Write-Host $_.FullName }
-        nuget restore '**/*.sln'
+        nuget restore 'src/${{ projectName }}.sln'
 
     - name: Build Solution
       run: msbuild /t:publish /p:Configuration=Release /p:DeployOnBuild=true /p:PublishDir=${{ env.binariesDirectory }} '**/*.sln'
