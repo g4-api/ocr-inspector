@@ -72,12 +72,15 @@ jobs:
       with:
         name: drop
 
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: drop/*
-        tag_name: v${{ steps.parse_version.outputs.buildVersion }}
-        release_name: Production v${{ steps.parse_version.outputs.buildVersion }}
-        body: "Release notes here"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check Version
+      run: Write-Host 'Production v${{ steps.parse_version.outputs.buildVersion }}'
+
+    # - name: Create GitHub Release
+    #   uses: softprops/action-gh-release@v1
+    #   with:
+    #     files: drop/*
+    #     tag_name: v${{ steps.parse_version.outputs.buildVersion }}
+    #     release_name: Production v${{ steps.parse_version.outputs.buildVersion }}
+    #     body: "Release notes here"
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
