@@ -51,7 +51,7 @@ jobs:
     name: Build and Publish - Version ${{ needs.new-version.outputs.buildVersion }}
     runs-on: windows-latest
     needs: new-version
-    if: ${{ needs.new-version.result == 'success' && needs.new-version.outputs.validVersion == True }}
+    if: ${{ needs.new-version.result == 'success' && needs.new-version.outputs.validVersion == 'True' }}
     
     env:
       buildVersion: ${{ needs.new-version.outputs.buildVersion }}
