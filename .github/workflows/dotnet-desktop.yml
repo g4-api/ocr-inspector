@@ -21,15 +21,20 @@ jobs:
     runs-on: windows-latest
     
     outputs:
-      buildVersion: ${{ env.buildVersion }}.${{ github.run_number }}
+      buildVersion: ${{ steps.vesion.outputs.buildVersion }}
     
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
         
       - name: Determine Build Version
+        id: vesion
         shell: pwsh
         run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> GITHUB_OUTPUT
+
+      - name: ''
+        shell: pwsh
+        run: echo "${{ env.buildVersion}}"
     
   build:
     name: Build and Package Application
