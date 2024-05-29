@@ -37,26 +37,21 @@ jobs:
       shell: pwsh
       run: echo "version=$(Get-Date -UFormat '%Y.%m.%d').${{ github.run_number }}" >> $env:GITHUB_OUTPUT
 
-    - name: Validate Version
+    - name: Validate Version ${{ steps.parse-version.outputs.version }}
       id: validate-version
       shell: pwsh
       run: |
         # comment place holder
         $version = "${{ steps.parse-version.outputs.version }}"
-        echo "valid=$($version -match '^\d+(\.\d+){3}$')" >> $env:GITHUB_OUTPUT
         #
         # comment place holder
-        #if ($version -match "^\d+(\.\d+){3}$") {
-        #  echo "valid=true" >> $env:GITHUB_OUTPUT
-        #} else {
-        #  echo "valid=false" >> $env:GITHUB_OUTPUT
-        #}
+        echo "valid=$($version -match '^\d+(\.\d+){3}$')" >> $env:GITHUB_OUTPUT
       
   build:
     name: Build and Publish - Version ${{ needs.new-version.outputs.buildVersion }}
     runs-on: windows-latest
     needs: new-version
-    #if: ${{ needs.new-version.result == 'success' && needs.new-version.outputs.validVersion == 'true' }}
+    if: ${{ needs.new-version.result == 'success' && needs.new-version.outputs.validVersion == True }}
     
     env:
       buildVersion: ${{ needs.new-version.outputs.buildVersion }}
