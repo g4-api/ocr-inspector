@@ -29,7 +29,7 @@ defaults:
 jobs:
   # Job to get the version of the build
   new-version:
-    name: Get Version
+    name: New Version
     runs-on: windows-latest
 
     # Outputs of the job
