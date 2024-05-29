@@ -24,28 +24,23 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
-    # - name: Setup .NET Core SDK
-    #   uses: actions/setup-dotnet@v4.0.0
-    #   with:
-    #     dotnet-version: 8
-
-    - name: Install NuGet Tools
-      uses: NuGet/setup-nuget@v1
+      
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4.0.0
+      with:
+        dotnet-version: 8
 
     - name: Restore Packages
-      run: |
-        Get-ChildItem -Path "${{ github.workspace }}" | ForEach-Object { Write-Host $_.FullName }
-        nuget restore '${{ env.projectName }}.sln'
+      run:  dotnet restore
 
-    - name: Build Solution
-      run: msbuild /t:publish /p:Configuration=Release /p:DeployOnBuild=true /p:PublishDir=${{ env.binariesDirectory }} '**/*.sln'
+    - name: Publish
+      run:  dotnet publish -c Release --self-contained -r win-x64
 
     - name: Create Build Artifact
       run: |
-        mkdir -p ${{ env.artifactStagingDirectory }}
-        cd $(Build.BinariesDirectory)
-        zip -r ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip .
+        Compress-Archive `
+            -Path OcrInspector/bin/Release/net8.0-windows/win-x64./publish/* `
+            -DestinationPath ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
