@@ -1,4 +1,4 @@
-name: OcrInspector Build and Publish
+name: Prodution - OcrInspector
 
 permissions:
   contents: write
@@ -7,7 +7,14 @@ on:
   push:
     branches:
       - main
-      
+
+env:
+  artifactStagingDirectory: ${{ github.workspace }}/artifact_staging
+  binariesDirectory: ${{ github.workspace }}/binaries
+  buildConfiguration: 'Release'
+  buildPlatform: 'any cpu'
+  projectName: OcrInspector
+  
 defaults:
   run:
     working-directory: src
@@ -18,7 +25,7 @@ jobs:
     runs-on: windows-latest
 
     outputs:
-      buildVersion: ${{ steps.parse-version.outputs.version }}
+      buildVersion: "${{ steps.parse-version.outputs.version }}.${{ github.run_number }}"
 
     steps:
     - name: Checkout repository
@@ -28,32 +35,19 @@ jobs:
       id: parse-version
       shell: pwsh
       run: echo "version=$(Get-Date -UFormat '%Y.%m.%d')" >> $env:GITHUB_OUTPUT
-
-    - name: Print buildVersion
-      shell: pwsh
-      run: Write-Host "version ${{ steps.parse-version.outputs.version }}"
       
   build:
     name: Build and Publish
     runs-on: windows-latest
     needs: new-version
-    if: success()
+    if: ${{ needs.new-version.result == 'success' && fromJSON('["' + needs.new-version.outputs.buildVersion + '"]')[0] =~ '^(\d+)(\.\d+){3}$' }}
 
     env:
-      buildPlatform: 'any cpu'
-      buildConfiguration: 'Release'
-      artifactStagingDirectory: ${{ github.workspace }}/artifact_staging
-      binariesDirectory: ${{ github.workspace }}/binaries
-      projectName: OcrInspector
       buildVersion: ${{ needs.new-version.outputs.buildVersion }}
-
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
-    - name: Restore Packages
-      shell: pwsh
-      run:  Write-Host 'v${{ env.buildVersion }}'
       
   #   - name: Setup .NET Core SDK
   #     uses: actions/setup-dotnet@v4.0.0
