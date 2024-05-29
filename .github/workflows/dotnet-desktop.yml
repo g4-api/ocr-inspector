@@ -1,5 +1,8 @@
 name: OcrInspector Build and Publish
 
+permissions:
+  contents: write
+  
 on:
   push:
     branches:
@@ -51,14 +54,16 @@ jobs:
 
   create_release:
     name: Create GitHub Release & Tag
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     if: success()
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
     - name: Parse Build Version for GitHub Tag
-      id: parse_version
-      run: echo "::set-output name=buildVersion::$(Get-Date -Format 'yyyy.MM.dd')"
+      run: echo "buildVersion=$(Get-Date -Format 'yyyy.MM.dd')" >> $GITHUB_OUTPUT
 
     - name: Download Build Artifacts
       uses: actions/download-artifact@v2
@@ -66,14 +71,13 @@ jobs:
         name: drop
 
     - name: Check Version
-      run: echo 'Production v${{ steps.parse_version.outputs.buildVersion }}.${{ github.run_number }}'
+      run: echo 'Production v${{ env.buildVersion }}.${{ github.run_number }}'
 
-    # - name: Create GitHub Release
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     files: drop/*
-    #     tag_name: v${{ steps.parse_version.outputs.buildVersion }}
-    #     release_name: Production v${{ steps.parse_version.outputs.buildVersion }}
-    #     body: "Release notes here"
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: drop/*
+        tag_name: v${{ env.buildVersion }}
+        name: Production v${{ env.buildVersion }}.${{ github.run_number }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
