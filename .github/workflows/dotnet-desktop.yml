@@ -18,6 +18,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+  
     - name: Get current date with PowerShell
       shell: pwsh
       run: echo "CURRENT_DATE=$(Get-Date -Format o)" >> $env:GITHUB_ENV
