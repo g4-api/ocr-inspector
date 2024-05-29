@@ -68,7 +68,11 @@ jobs:
     - name: Parse Build Version for GitHub Tag
       shell: pwsh
       run: echo "buildVersion=$(Get-Date -Format 'yyyy.MM.dd')" >> $GITHUB_OUTPUT
-
+    
+    - name: Print buildVersion
+      shell: pwsh
+      run: Write-Host "buildVersion ${{ env.buildVersion }}"
+      
     - name: Download Build Artifacts
       uses: actions/download-artifact@v4.1.7
       with:
