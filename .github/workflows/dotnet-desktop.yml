@@ -24,6 +24,9 @@ jobs:
       buildVersion: ${{ env.buildVersion }}.${{ github.run_number }}
     
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+        
       - name: Determine Build Version
         shell: pwsh
         run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> GITHUB_OUTPUT
