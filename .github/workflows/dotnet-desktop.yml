@@ -25,7 +25,7 @@ jobs:
     runs-on: windows-latest
 
     outputs:
-      buildVersion: "${{ steps.parse-version.outputs.version }}"
+      buildVersion: ${{ steps.parse-version.outputs.version }}
       validVersion: ${{ steps.validate-version.outputs.valid }}
 
     steps:
@@ -43,13 +43,14 @@ jobs:
       run: |
         # comment place holder
         $version = "${{ steps.parse-version.outputs.version }}"
+        echo "valid=$($version -match '^\d+(\.\d+){3}$')" >> $env:GITHUB_OUTPUT
         #
         # comment place holder
-        if ($version -match "^\d+(\.\d+){3}$") {
-          echo "valid=true" >> $env:GITHUB_OUTPUT
-        } else {
-          echo "valid=false" >> $env:GITHUB_OUTPUT
-        }
+        #if ($version -match "^\d+(\.\d+){3}$") {
+        #  echo "valid=true" >> $env:GITHUB_OUTPUT
+        #} else {
+        #  echo "valid=false" >> $env:GITHUB_OUTPUT
+        #}
       
   build:
     name: Build and Publish - Version ${{ needs.new-version.outputs.buildVersion }}
