@@ -60,8 +60,7 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Parse Build Version for GitHub Tag
-      id: parse_version
-      run: echo "::set-output name=buildVersion::$(Get-Date -Format 'yyyy.MM.dd')"
+      run: echo "buildVersion=$(Get-Date -Format 'yyyy.MM.dd')" >> $GITHUB_OUTPUT
 
     - name: Download Build Artifacts
       uses: actions/download-artifact@v2
@@ -69,7 +68,7 @@ jobs:
         name: drop
 
     - name: Check Version
-      run: echo 'Production v${{ steps.parse_version.outputs.buildVersion }}.${{ github.run_number }}'
+      run: echo 'Production v${{ env.buildVersion }}.${{ github.run_number }}'
 
     # - name: Create GitHub Release
     #   uses: softprops/action-gh-release@v1
