@@ -58,7 +58,7 @@ jobs:
 
   # Job to build and publish the project
   build:
-    name: Build and Publish - Version ${{ needs.new-version.outputs.buildVersion }}
+    name: Build & Publish Version ${{ needs.new-version.outputs.buildVersion }}
     runs-on: windows-latest
     needs: new-version
     if: ${{ needs.new-version.result == 'success' && needs.new-version.outputs.validVersion == 'True' }}
@@ -110,7 +110,7 @@ jobs:
 
   # Job to create a GitHub release and tag the new version
   create-release:
-    name: Create GitHub Release & Tag Version ${{ needs.new-version.outputs.buildVersion }}
+    name: New GitHub Release Version ${{ needs.new-version.outputs.buildVersion }}
     runs-on: windows-latest
     needs: 
       - new-version
