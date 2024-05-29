@@ -44,7 +44,7 @@ jobs:
         New-Item -Path "${{ env.artifactStagingDirectory }}" -ItemType Directory
         Compress-Archive `
             -Path OcrInspector/bin/Release/net8.0-windows/win-x64./publish/* `
-            -DestinationPath ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip
+            -DestinationPath ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip 
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v2
@@ -76,7 +76,7 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: drop/*.zip
+        files: ./*.zip
         tag_name: v${{ env.buildVersion }}
         name: Production v${{ env.buildVersion }}.${{ github.run_number }}
       env:
