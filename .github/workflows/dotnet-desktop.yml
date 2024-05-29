@@ -34,88 +34,88 @@ jobs:
 
       - name: ''
         shell: pwsh
-        run: echo "${{ env.buildVersion}}"
+        run: Write-Host "${{ env.buildVersion}}"
     
-  build:
-    name: Build and Package Application
-    runs-on: windows-latest
-    needs: set_version
-    if: success()
+  # build:
+  #   name: Build and Package Application
+  #   runs-on: windows-latest
+  #   needs: set_version
+  #   if: success()
 
-    # Environment variables for the build process
-    env:
-      buildPlatform: 'any cpu'
-      buildConfiguration: 'Release'
-      artifactStagingDirectory: ${{ github.workspace }}/artifact_staging
-      binariesDirectory: ${{ github.workspace }}/binaries
-      projectName: OcrInspector
-      releaseType: Production
+  #   # Environment variables for the build process
+  #   env:
+  #     buildPlatform: 'any cpu'
+  #     buildConfiguration: 'Release'
+  #     artifactStagingDirectory: ${{ github.workspace }}/artifact_staging
+  #     binariesDirectory: ${{ github.workspace }}/binaries
+  #     projectName: OcrInspector
+  #     releaseType: Production
 
-    steps:
-      # Step 1: Checkout the repository
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+  #   steps:
+  #     # Step 1: Checkout the repository
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v2
       
-      # Step 2: Setup .NET Core SDK
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v4.0.0
-        with:
-          dotnet-version: 8
+  #     # Step 2: Setup .NET Core SDK
+  #     - name: Setup .NET Core SDK
+  #       uses: actions/setup-dotnet@v4.0.0
+  #       with:
+  #         dotnet-version: 8
 
-      # Step 3: Restore NuGet Packages
-      - name: Restore NuGet Packages
-        shell: pwsh
-        run: dotnet restore
+  #     # Step 3: Restore NuGet Packages
+  #     - name: Restore NuGet Packages
+  #       shell: pwsh
+  #       run: dotnet restore
 
-      # Step 4: Publish the Application
-      - name: Publish Application
-        shell: pwsh
-        run: dotnet publish -c Release --self-contained -r win-x64
+  #     # Step 4: Publish the Application
+  #     - name: Publish Application
+  #       shell: pwsh
+  #       run: dotnet publish -c Release --self-contained -r win-x64
 
-      # Step 5: Create Build Artifact Directory and Compress Files
-      - name: Create Build Artifact
-        shell: pwsh
-        run: |
-          New-Item -Path "${{ env.artifactStagingDirectory }}" -ItemType Directory
-          Compress-Archive `
-              -Path OcrInspector/bin/Release/net8.0-windows/win-x64/publish/* `
-              -DestinationPath ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip
+  #     # Step 5: Create Build Artifact Directory and Compress Files
+  #     - name: Create Build Artifact
+  #       shell: pwsh
+  #       run: |
+  #         New-Item -Path "${{ env.artifactStagingDirectory }}" -ItemType Directory
+  #         Compress-Archive `
+  #             -Path OcrInspector/bin/Release/net8.0-windows/win-x64/publish/* `
+  #             -DestinationPath ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip
 
-      # Step 6: Upload Build Artifact to GitHub
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4.3.3
-        with:
-          name: Build Artifact
-          path: ${{ env.artifactStagingDirectory }}/*.zip
+  #     # Step 6: Upload Build Artifact to GitHub
+  #     - name: Upload Build Artifact
+  #       uses: actions/upload-artifact@v4.3.3
+  #       with:
+  #         name: Build Artifact
+  #         path: ${{ env.artifactStagingDirectory }}/*.zip
 
-  create_release:
-    name: Create and Publish GitHub Release
-    runs-on: windows-latest
-    needs: build
-    if: success()
+  # create_release:
+  #   name: Create and Publish GitHub Release
+  #   runs-on: windows-latest
+  #   needs: build
+  #   if: success()
 
-    steps:
-      # Step 1: Checkout the repository
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+  #   steps:
+  #     # Step 1: Checkout the repository
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v2
 
-      # # Step 2: Determine Build Version for Tagging
-      # - name: Determine Build Version
-      #   shell: pwsh
-      #   run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> GITHUB_OUTPUT
+  #     # # Step 2: Determine Build Version for Tagging
+  #     # - name: Determine Build Version
+  #     #   shell: pwsh
+  #     #   run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> GITHUB_OUTPUT
       
-      # Step 3: Download Build Artifacts
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4.1.7
-        with:
-          name: Build Artifact
+  #     # Step 3: Download Build Artifacts
+  #     - name: Download Build Artifacts
+  #       uses: actions/download-artifact@v4.1.7
+  #       with:
+  #         name: Build Artifact
 
-      # Step 4: Create GitHub Release
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: ./*.zip
-          tag_name: v${{ needs.set_date.outputs.buildVersion }}
-          name: ${{ env.releaseType }} v${{ needs.set_date.outputs.buildVersion }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     # Step 4: Create GitHub Release
+  #     - name: Create GitHub Release
+  #       uses: softprops/action-gh-release@v1
+  #       with:
+  #         files: ./*.zip
+  #         tag_name: v${{ needs.set_date.outputs.buildVersion }}
+  #         name: ${{ env.releaseType }} v${{ needs.set_date.outputs.buildVersion }}
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
