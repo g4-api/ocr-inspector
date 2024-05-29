@@ -10,6 +10,7 @@ on:
 
 env:
   artifactStagingDirectory: ${{ github.workspace }}/artifact_staging
+  artifactType: 'Production'
   binariesDirectory: ${{ github.workspace }}/binaries
   buildConfiguration: 'Release'
   buildPlatform: 'any cpu'
@@ -65,74 +66,56 @@ jobs:
       shell: pwsh
       run:  Write-Host ${{ env.validVersion }}
       
-  #   - name: Setup .NET Core SDK
-  #     uses: actions/setup-dotnet@v4.0.0
-  #     with:
-  #       dotnet-version: 8
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4.0.0
+      with:
+        dotnet-version: 8
 
-  #   - name: Restore Packages
-  #     shell: pwsh
-  #     run:  dotnet restore
+    - name: Restore Packages
+      shell: pwsh
+      run:  dotnet restore
 
-  #   - name: Publish
-  #     shell: pwsh
-  #     run:  dotnet publish -c Release --self-contained -r win-x64
+    - name: Publish
+      shell: pwsh
+      run:  dotnet publish -c Release --self-contained -r win-x64
 
-  #   - name: Create Build Artifact
-  #     shell: pwsh
-  #     run: |
-  #       New-Item -Path "${{ env.artifactStagingDirectory }}" -ItemType Directory
-  #       Compress-Archive `
-  #           -Path OcrInspector/bin/Release/net8.0-windows/win-x64./publish/* `
-  #           -DestinationPath ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip 
+    - name: Create Build Artifact
+      shell: pwsh
+      run: |
+        New-Item -Path "${{ env.artifactStagingDirectory }}" -ItemType Directory
+        Compress-Archive `
+            -Path OcrInspector/bin/Release/net8.0-windows/win-x64./publish/* `
+            -DestinationPath ${{ env.artifactStagingDirectory }}/${{ env.projectName }}.${{ env.validVersion }}-win-x64.zip 
 
-  #   - name: Upload a Build Artifact
-  #     uses: actions/upload-artifact@v4.3.3
-  #     with:
-  #       name: drop
-  #       path: ${{ env.artifactStagingDirectory }}/*.zip
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.3.3
+      with:
+        name: drop
+        path: ${{ env.artifactStagingDirectory }}/*.zip
 
-  # create_release:
-  #   name: Create GitHub Release & Tag
-  #   runs-on: windows-latest
-  #   needs: build
-  #   if: success()
+  create_release:
+    name: Create GitHub Release & Tag - ${{ env.artifactType }} v${{ needs.new-version.outputs.buildVersion }}
+    runs-on: windows-latest
+    needs: build
+    if: success()
 
-  #   steps:
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v2
+    env:
+      buildVersion: ${{ needs.new-version.outputs.buildVersion }}
 
-  #   - name: Get current date with PowerShell
-  #     shell: pwsh
-  #     run: echo "CURRENT_DATE=$(Get-Date -Format o)" >> $env:GITHUB_ENV
-
-  #   - name: Print current date
-  #     shell: pwsh
-  #     run: echo "The current date is $env:CURRENT_DATE"
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
       
-  #   - name: Parse Build Version for GitHub Tag
-  #     id: parse-version
-  #     shell: pwsh
-  #     run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> $env:GITHUB_OUTPUT
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4.1.7
+      with:
+        name: drop
 
-  #   - name: Print buildVersion
-  #     shell: pwsh
-  #     run: Write-Host "buildVersion ${{ steps.parse-version.outputs.buildVersion }}"
-      
-  #   - name: Download Build Artifacts
-  #     uses: actions/download-artifact@v4.1.7
-  #     with:
-  #       name: drop
-
-  #   - name: Check Version
-  #     shell: pwsh
-  #     run: Write-Host "Production v${{ env.buildVersion }}.${{ github.run_number }}"
-
-  #   - name: Create GitHub Release & Tag - Version ${{ needs.new-version.outputs.buildVersion }}
-  #     uses: softprops/action-gh-release@v1
-  #     with:
-  #       files: ./*.zip
-  #       tag_name: v${{ env.buildVersion }}
-  #       name: Production v${{ env.buildVersion }}.${{ github.run_number }}
-  #     env:
-  #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create GitHub Release & Tag - v${{ env.buildVersion }}
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ./*.zip
+        tag_name: v${{ env.buildVersion }}
+        name: ${{ env.artifactType }} v${{ env.buildVersion }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
