@@ -37,11 +37,11 @@ jobs:
       run: echo "version=$(Get-Date -UFormat '%Y.%m.%d')" >> $env:GITHUB_OUTPUT
       
   build:
-    name: Build and Publish
+    name: Build and Publish - Version ${{ needs.new-version.outputs.buildVersion }}
     runs-on: windows-latest
     needs: new-version
-    if: ${{ needs.new-version.result == 'success' && fromJSON('["' + needs.new-version.outputs.buildVersion + '"]')[0] =~ '^(\d+)(\.\d+){3}$' }}
-
+    if: ${{ needs.new-version.result == 'success' && (needs.new-version.outputs.buildVersion =~ '^(\d+)(\.\d+){3}$') }}
+    
     env:
       buildVersion: ${{ needs.new-version.outputs.buildVersion }}
     
@@ -112,7 +112,7 @@ jobs:
   #     shell: pwsh
   #     run: Write-Host "Production v${{ env.buildVersion }}.${{ github.run_number }}"
 
-  #   - name: Create GitHub Release
+  #   - name: Create GitHub Release & Tag - Version ${{ needs.new-version.outputs.buildVersion }}
   #     uses: softprops/action-gh-release@v1
   #     with:
   #       files: ./*.zip
