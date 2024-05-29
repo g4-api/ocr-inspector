@@ -1,4 +1,4 @@
-name: ${{ env.DATE }} - OcrInspector Build and Publish
+name: OcrInspector Build and Publish
 
 # Permissions required for the workflow
 permissions:
@@ -16,9 +16,23 @@ defaults:
     working-directory: src
 
 jobs:
+  set_version:
+    name: ''
+    runs-on: windows-latest
+    
+    outputs:
+      buildVersion: ${{ env.buildVersion }}.${{ github.run_number }}
+    
+    steps:
+      - name: Determine Build Version
+        shell: pwsh
+        run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> GITHUB_OUTPUT
+    
   build:
     name: Build and Package Application
     runs-on: windows-latest
+    needs: set_version
+    if: success()
 
     # Environment variables for the build process
     env:
@@ -77,10 +91,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      # Step 2: Determine Build Version for Tagging
-      - name: Determine Build Version
-        shell: pwsh
-        run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> GITHUB_OUTPUT
+      # # Step 2: Determine Build Version for Tagging
+      # - name: Determine Build Version
+      #   shell: pwsh
+      #   run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> GITHUB_OUTPUT
       
       # Step 3: Download Build Artifacts
       - name: Download Build Artifacts
@@ -93,7 +107,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: ./*.zip
-          tag_name: v${{ env.buildVersion }}
-          name: ${{ env.releaseType }} v${{ env.buildVersion }}.${{ github.run_number }}
+          tag_name: v${{ needs.set_date.outputs.buildVersion }}
+          name: ${{ env.releaseType }} v${{ needs.set_date.outputs.buildVersion }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
