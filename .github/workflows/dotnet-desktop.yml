@@ -34,12 +34,15 @@ jobs:
         dotnet-version: 8
 
     - name: Restore Packages
+      shell: pwsh
       run:  dotnet restore
 
     - name: Publish
+      shell: pwsh
       run:  dotnet publish -c Release --self-contained -r win-x64
 
     - name: Create Build Artifact
+      shell: pwsh
       run: |
         New-Item -Path "${{ env.artifactStagingDirectory }}" -ItemType Directory
         Compress-Archive `
@@ -63,6 +66,7 @@ jobs:
       uses: actions/checkout@v2
       
     - name: Parse Build Version for GitHub Tag
+      shell: pwsh
       run: echo "buildVersion=$(Get-Date -Format 'yyyy.MM.dd')" >> $GITHUB_OUTPUT
 
     - name: Download Build Artifacts
@@ -71,7 +75,8 @@ jobs:
         name: drop
 
     - name: Check Version
-      run: echo "Production v${{ env.buildVersion }}.${{ github.run_number }}"
+      shell: pwsh
+      run: Write-Host "Production v${{ env.buildVersion }}.${{ github.run_number }}"
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
