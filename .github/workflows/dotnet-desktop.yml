@@ -64,6 +64,14 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - name: Get current date with PowerShell
+      shell: pwsh
+      run: echo "CURRENT_DATE=$(Get-Date -Format o)" >> $env:GITHUB_ENV
+
+    - name: Print current date
+      shell: pwsh
+      run: echo "The current date is $env:CURRENT_DATE"
       
     - name: Parse Build Version for GitHub Tag
       shell: pwsh
