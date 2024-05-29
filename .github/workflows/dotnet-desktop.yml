@@ -55,14 +55,19 @@ jobs:
     name: Build and Publish - Version ${{ needs.new-version.outputs.buildVersion }}
     runs-on: windows-latest
     needs: new-version
-    if: ${{ needs.new-version.result == 'success' && needs.new-version.outputs.validVersion == 'true' }}
+    #if: ${{ needs.new-version.result == 'success' && needs.new-version.outputs.validVersion == 'true' }}
     
     env:
       buildVersion: ${{ needs.new-version.outputs.buildVersion }}
+      validVersion: ${{ needs.new-version.outputs.validVersion }}
     
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - name: Publish
+      shell: pwsh
+      run:  Write-Host ${{ env.validVersion }}
       
   #   - name: Setup .NET Core SDK
   #     uses: actions/setup-dotnet@v4.0.0
