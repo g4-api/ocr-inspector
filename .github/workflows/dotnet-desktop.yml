@@ -70,12 +70,12 @@ jobs:
     - name: Check Version
       run: echo 'Production v${{ env.buildVersion }}.${{ github.run_number }}'
 
-    # - name: Create GitHub Release
-    #   uses: softprops/action-gh-release@v1
-    #   with:
-    #     files: drop/*
-    #     tag_name: v${{ steps.parse_version.outputs.buildVersion }}
-    #     release_name: Production v${{ steps.parse_version.outputs.buildVersion }}
-    #     body: "Release notes here"
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: drop/*
+        tag_name: v${{ env.buildVersion }}
+        release_name: Production v${{ env.buildVersion }}.${{ github.run_number }}
+        body: ""
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
