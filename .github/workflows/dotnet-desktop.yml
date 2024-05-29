@@ -13,45 +13,47 @@ defaults:
     working-directory: src
 
 jobs:
-  versioning:
+  new-version:
     name: Get Version
     runs-on: windows-latest
+
+    outputs:
+      buildVersion: ${{ steps.set-date.outputs.date }}
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-  
-    - name: Get current date with PowerShell
-      shell: pwsh
-      run: echo "CURRENT_DATE=$(Get-Date -Format o)" >> $env:GITHUB_ENV
-
-    - name: Print current date
-      shell: pwsh
-      run: echo "The current date is $env:CURRENT_DATE"
       
     - name: Parse Build Version for GitHub Tag
       id: parse-version
       shell: pwsh
-      run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> $env:GITHUB_OUTPUT
+      run: echo "version=$(Get-Date -UFormat '%Y.%m.%d')" >> $env:GITHUB_OUTPUT
 
     - name: Print buildVersion
       shell: pwsh
-      run: Write-Host "buildVersion ${{ steps.parse-version.outputs.buildVersion }}"
+      run: Write-Host "version ${{ steps.parse-version.outputs.version }}"
       
-  # build:
-  #   name: Build and Publish
-  #   runs-on: windows-latest
+  build:
+    name: Build and Publish
+    runs-on: windows-latest
+    needs: new-version
+    if: success()
 
-  #   env:
-  #     buildPlatform: 'any cpu'
-  #     buildConfiguration: 'Release'
-  #     artifactStagingDirectory: ${{ github.workspace }}/artifact_staging
-  #     binariesDirectory: ${{ github.workspace }}/binaries
-  #     projectName: OcrInspector
+    env:
+      buildPlatform: 'any cpu'
+      buildConfiguration: 'Release'
+      artifactStagingDirectory: ${{ github.workspace }}/artifact_staging
+      binariesDirectory: ${{ github.workspace }}/binaries
+      projectName: OcrInspector
+      buildVersion: ${{ needs.new-version.outputs.buildVersion }}
 
-  #   steps:
-  #   - name: Checkout repository
-  #     uses: actions/checkout@v2
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Restore Packages
+      shell: pwsh
+      run:  Write-Host 'v${{ env.buildVersion }}'
       
   #   - name: Setup .NET Core SDK
   #     uses: actions/setup-dotnet@v4.0.0
