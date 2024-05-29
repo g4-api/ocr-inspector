@@ -34,7 +34,7 @@ jobs:
 
       - name: ''
         shell: pwsh
-        run: Write-Host "${{ env.buildVersion}}"
+        run: Write-Host "${{ env.buildVersion }}"
     
   # build:
   #   name: Build and Package Application
