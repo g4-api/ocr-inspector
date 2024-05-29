@@ -75,7 +75,7 @@ jobs:
       
     - name: Parse Build Version for GitHub Tag
       shell: pwsh
-      run: echo "buildVersion=$(Get-Date -Format 'yyyy.MM.dd')" >> $GITHUB_OUTPUT
+      run: echo "buildVersion=$(Get-Date -UFormat '%Y.%m.%d')" >> $GITHUB_OUTPUT
     
     - name: Print buildVersion
       shell: pwsh
