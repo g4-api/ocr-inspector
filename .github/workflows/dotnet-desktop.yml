@@ -67,7 +67,7 @@ jobs:
 
     - name: Get current date with PowerShell
       shell: pwsh
-      run: echo "CURRENT_DATE=$(Get-Date -Format o)" >> $env:GITHUB_ENV
+      run: echo "CURRENT_DATE=$(Get-Date -Format Get-Date -UFormat %Y.%m.%d)" >> $env:GITHUB_ENV
 
     - name: Print current date
       shell: pwsh
