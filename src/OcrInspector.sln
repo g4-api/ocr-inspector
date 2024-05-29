@@ -23,7 +23,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".documents", ".documents", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{40E91B1E-E57B-40A5-918E-6ECB3331F32D}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\dotnet-desktop.yml = ..\.github\workflows\dotnet-desktop.yml
+		..\.github\workflows\GithubActions.yml = ..\.github\workflows\GithubActions.yml
 	EndProjectSection
 EndProject
 Global
