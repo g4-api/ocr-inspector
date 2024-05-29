@@ -18,7 +18,7 @@ jobs:
     runs-on: windows-latest
 
     outputs:
-      buildVersion: ${{ steps.set-date.outputs.date }}
+      buildVersion: ${{ steps.parse-version.outputs.version }}
 
     steps:
     - name: Checkout repository
