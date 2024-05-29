@@ -46,11 +46,11 @@ jobs:
             -Path OcrInspector/bin/Release/net8.0-windows/win-x64./publish/* `
             -DestinationPath ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip 
 
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v2
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v4.3.3
       with:
         name: drop
-        path: ${{ env.artifactStagingDirectory }}/${{ github.run_number }}-win-x64.zip
+        path: ${{ env.artifactStagingDirectory }}/*.zip
 
   create_release:
     name: Create GitHub Release & Tag
