@@ -3,14 +3,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OcrInspector", "OcrInspector\OcrInspector.csproj", "{3B6A2628-5D91-46AB-85F5-E868C982E18D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OcrInspector", "OcrInspector\OcrInspector.csproj", "{3B6A2628-5D91-46AB-85F5-E868C982E18D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".git", ".git", "{8D9F4EAE-C1E6-4760-86A1-D5DF7FD6659A}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
+		..\.gitignore = ..\.gitignore
+		..\LICENSE = ..\LICENSE
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{9F72906C-26F5-422B-B91D-5EEF2EE43FB1}"
+	ProjectSection(SolutionItems) = preProject
+		..\build\AzurePipeline.yaml = ..\build\AzurePipeline.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".documents", ".documents", "{8E8AA423-669A-44A7-BCAA-D660F1F86E65}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{40E91B1E-E57B-40A5-918E-6ECB3331F32D}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\dotnet-desktop.yml = ..\.github\workflows\dotnet-desktop.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
