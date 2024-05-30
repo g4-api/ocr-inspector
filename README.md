@@ -1,5 +1,7 @@
 # OCR Inspector v1.0
 
+[![OCR Inspector Production](https://github.com/g4-api/ocr-inspector/actions/workflows/GithubActions.yml/badge.svg?branch=main)](https://github.com/g4-api/ocr-inspector/actions/workflows/GithubActions.yml)  
+
 OCR Inspector is a WPF application that uses Tesseract OCR to process images, recognize text, and display the results with interactive elements. This application allows users to load images, perform OCR, and view the recognized words along with their confidence levels. Users can also copy OCR results to the clipboard directly from the UI.
 
 ## Features

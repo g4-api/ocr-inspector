@@ -1,5 +1,5 @@
 # Workflow to build and release OcrInspector for production
-name: OcrInspector Production
+name: OCR Inspector Production
 
 # Permissions for the workflow
 permissions:
