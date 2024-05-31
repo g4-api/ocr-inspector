@@ -13,8 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".git", ".git", "{8D9F4EAE-C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{9F72906C-26F5-422B-B91D-5EEF2EE43FB1}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\AzurePipeline.yaml = ..\build\AzurePipeline.yaml
 		..\.github\workflows\GithubActions.yml = ..\.github\workflows\GithubActions.yml
+		..\build\AzurePipeline.yml = ..\build\AzurePipeline.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".documents", ".documents", "{8E8AA423-669A-44A7-BCAA-D660F1F86E65}"
