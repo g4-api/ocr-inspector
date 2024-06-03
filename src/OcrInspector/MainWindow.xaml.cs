@@ -1,5 +1,12 @@
-﻿using System;
+﻿using Emgu.CV;
+using Emgu.CV.OCR;
+using Emgu.CV.Structure;
+
+using Microsoft.Win32;
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -8,14 +15,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-
-using Emgu.CV;
-using Emgu.CV.OCR;
-using Emgu.CV.Structure;
-
-using Microsoft.Win32;
-
-
 
 namespace OcrInspector
 {
@@ -87,57 +86,61 @@ namespace OcrInspector
             MainCanvas.Height = bitmap.PixelHeight;
         }
 
-        // Event handler for the Take Screenshot button click event to take a screenshot of the main monitor
-        // to process using Tesseract OCR and display in the window UI elements
+        // Handles the click event of the screenshot button. Takes a screenshot of the primary display, processes it using Tesseract OCR,
+        // and displays the recognized words as clickable points on the canvas.
         private void BtnTakeScreenshot_Click(object sender, RoutedEventArgs e)
         {
-            // Prevent app window to be seen in the screenshot.
+            // Hide the main window to avoid it appearing in the screenshot.
             Application.Current.MainWindow.Hide();
+
+            // Wait for a short period to ensure the window is hidden before taking the screenshot.
             Thread.Sleep(500);
 
-            // Take screenshot of main display.
-            const int ENUM_CURRENT_SETTINGS = -1;
-            DevMode devMode = default;
-            devMode.dmSize = (short)Marshal.SizeOf(devMode);
-            EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref devMode);
-            var bitmap = new Bitmap(devMode.dmPelsWidth,
-                                       devMode.dmPelsHeight,
-                                       System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            
+            // Get the current display settings.
+            var devMode = ExternalMethods.GetDisplaySettings();
 
-            var gfxScreenshot = Graphics.FromImage(bitmap);
-            gfxScreenshot.CopyFromScreen(devMode.dmPositionX, devMode.dmPositionY, 0, 0, bitmap.Size);
+            // Create a bitmap with the dimensions of the primary display.
+            var image = new Bitmap(
+                width: devMode.dmPelsWidth,
+                height: devMode.dmPelsHeight,
+                format: System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            // Capture the screen and copy it to the bitmap.
+            Graphics.FromImage(image).CopyFromScreen(
+                sourceX: devMode.dmPositionX,
+                sourceY: devMode.dmPositionY,
+                destinationX: 0,
+                destinationY: 0,
+                blockRegionSize: image.Size);
+
+            // Show the main window again.
             Application.Current.MainWindow.Show();
 
-            // Increase DPI for better accuracy.
-            bitmap.SetResolution(300, 300);
+            // Set the resolution of the bitmap to 300 DPI.
+            image.SetResolution(300, 300);
 
-            // Process the image using Tesseract OCR and get the recognized words along with the
-            // processed image with bounding boxes around the recognized words drawn on it
-            var resolvedImage = ResolveWords(bitmap);
+            // Process the image using Tesseract OCR to recognize words and draw bounding boxes around them.
+            var resolvedImage = ResolveWords(image);
 
-            // Clear the existing clickable points on the MainCanvas to display the new image and recognized words
-            MainCanvas.Children.RemoveRange(1, MainCanvas.Children.Count - 2);
+            // Clear the existing clickable points on the MainCanvas.
+            MainCanvas.Children.RemoveRange(index: 1, count: MainCanvas.Children.Count - 2);
 
-            // Add clickable points to the MainCanvas at the locations of the recognized words
+            // Add clickable points to the MainCanvas at the locations of the recognized words.
             foreach (var word in resolvedImage.Words)
             {
                 AddClickablePoint(word);
             }
 
-            // Display the image and the recognized words in the UI elements of the window
+            // Display the processed image with recognized words in the UI.
             MainImage.Source = resolvedImage.ImageSource;
 
-            // Set the image size to its original size to display the image correctly in
-            // the window without distortion or cropping issues
-            MainImage.Width = bitmap.Width;
-            MainImage.Height = bitmap.Height;
+            // Set the dimensions of the MainImage to match the original image size.
+            MainImage.Width = image.Width;
+            MainImage.Height = image.Height;
 
-            // Set the width of the MainCanvas to match the width of the MainImage
-            MainCanvas.Width = bitmap.Width;
-
-            // Set the height of the MainCanvas to match the height of the MainImage
-            MainCanvas.Height = bitmap.Height;
+            // Set the dimensions of the MainCanvas to match the MainImage size.
+            MainCanvas.Width = image.Width;
+            MainCanvas.Height = image.Height;
         }
 
         // Processes the image at the given path using Tesseract OCR, converts it to grayscale, recognizes the text,
@@ -166,15 +169,17 @@ namespace OcrInspector
 
         // Converts the provided Bitmap for processing with Tesseract OCR, converts it to grayscale, recognizes the text,
         // draws bounding boxes around the recognized words, and returns the processed image along with the list of recognized words.
-        private static (ImageSource ImageSource, List<Tesseract.Word> Words) ResolveWords(Bitmap bitmap)
+        private static (ImageSource ImageSource, List<Tesseract.Word> Words) ResolveWords(Bitmap image)
         {
             // Load the image
-            using var image = bitmap.ToImage<Bgr, byte>();
+            using var processedImage = image.ToImage<Bgr, byte>();
+
             // Initialize Tesseract OCR
             using var ocr = new Tesseract("TrainData/", "eng", OcrEngineMode.Default);
-            ocr.PageSegMode = Emgu.CV.OCR.PageSegMode.SparseText;
+            ocr.PageSegMode = PageSegMode.SparseText;
+
             // Convert to grayscale for OCR processing (Tesseract requires a grayscale image)
-            using var grayImage = image.Convert<Gray, byte>();
+            using var grayImage = processedImage.Convert<Gray, byte>();
 
             // Perform OCR on the grayscale image and get the recognized words
             ocr.SetImage(grayImage);
@@ -235,13 +240,49 @@ namespace OcrInspector
             // Add the rectangle to the MainCanvas to display the clickable point on the image
             MainCanvas.Children.Add(rectangle);
         }
+    }
 
-        #region ExternalMethods
+    /// <summary>
+    /// Provides methods and structures for working with display settings.
+    /// </summary>
+    public static class ExternalMethods
+    {
+        // Enumerates the display settings for the specified device.
         [DllImport("user32.dll")]
-        static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DevMode devMode);
+        [SuppressMessage(
+            category: "Interoperability",
+            checkId: "SYSLIB1054:Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time",
+            Justification = "Using DllImport for compatibility with existing P/Invoke patterns.")]
+        [SuppressMessage(
+            category: "Globalization",
+            checkId: "CA2101:Specify marshaling for P/Invoke string arguments",
+            Justification = "Marshaling not specified for string arguments as this is consistent with existing legacy code which has been tested and is known to work correctly.")]
+        private static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DevMode devMode);
 
+        /// <summary>
+        /// Retrieves the current display settings.
+        /// </summary>
+        /// <returns>A <see cref="DevMode"/> structure containing the current display settings.</returns>
+        public static DevMode GetDisplaySettings()
+        {
+            // Initialize a DevMode structure with default values.
+            DevMode devMode = default;
+
+            // Set the size of the DevMode structure.
+            devMode.dmSize = (short)Marshal.SizeOf(devMode);
+
+            // Retrieve the current display settings.
+            EnumDisplaySettings(null, -1, ref devMode);
+
+            // Return the DevMode structure containing the display settings.
+            return devMode;
+        }
+
+        /// <summary>
+        /// Defines the display settings structure used by the <see cref="EnumDisplaySettings"/> function.
+        /// </summary>
         [StructLayout(LayoutKind.Sequential)]
-        struct DevMode
+        public struct DevMode
         {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x20)]
             public string dmDeviceName;
@@ -276,8 +317,5 @@ namespace OcrInspector
             public int dmPanningWidth;
             public int dmPanningHeight;
         }
-        #endregion
     }
-
-
 }

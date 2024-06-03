@@ -45,11 +45,11 @@
                 Grid.Row="1"/>
 
         <Button Name="BtnTakeScreenshot"
-                Content="Take Screenshot..."
-                HorizontalAlignment="Center"
+                Content="Take Screenshot"
+                HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Width="100"
-                Margin="10,10,0,0"
+                Margin="115,10,0,0"
                 Click="BtnTakeScreenshot_Click"
                 Grid.Row="1"/>
 
