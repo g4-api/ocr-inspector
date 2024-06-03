@@ -40,8 +40,17 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Width="100"
-                Margin="10"
+                Margin="10,10,0,0"
                 Click="BtnLoadImage_Click"
+                Grid.Row="1"/>
+
+        <Button Name="BtnTakeScreenshot"
+                Content="Take Screenshot..."
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                Width="100"
+                Margin="10,10,0,0"
+                Click="BtnTakeScreenshot_Click"
                 Grid.Row="1"/>
 
         <ScrollViewer Name="MainScrollViewer"
