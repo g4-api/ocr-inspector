@@ -53,6 +53,27 @@
                 Click="BtnTakeScreenshot_Click"
                 Grid.Row="1"/>
 
+        <Button Name="BtnFromDriver"
+                Content="From Driver"
+                ToolTip="Show the screenshot and the OCR words of a running UiaDriver Server (-emgu build)"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Width="100"
+                Margin="220,10,0,0"
+                Click="BtnFromDriver_Click"
+                Grid.Row="1"/>
+
+        <TextBox Name="TxtDriverUrl"
+                 Text="http://localhost:5555"
+                 ToolTip="UiaDriver Server address"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Top"
+                 VerticalContentAlignment="Center"
+                 Width="220"
+                 Height="20"
+                 Margin="325,10,0,0"
+                 Grid.Row="1"/>
+
         <ScrollViewer Name="MainScrollViewer"
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
