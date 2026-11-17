@@ -7,10 +7,12 @@ OCR Inspector is a WPF application that uses Tesseract OCR to process images, re
 ## Features
 
 - Load and display images in their original size.
-- Perform OCR on loaded images using Tesseract OCR.
+- Take a screenshot of the primary display and inspect it.
+- Show the screenshot and the OCR words of a running UiaDriver Server.
+- Perform OCR with the same recognition and matching code as the UiaDriver Server.
 - Display recognized words with bounding boxes.
-- Interactive tooltips for recognized words showing text and accuracy.
-- Copy OCR results to the clipboard.
+- Interactive tooltips for recognized words showing the OCR locator and accuracy.
+- Copy the OCR locator of a word to the clipboard.
 
 ## Screenshots
 
@@ -69,11 +71,37 @@ If you want to OCR extra languages, download the [Tesseract language data files]
    - Click the "Load Image..." button to open a file dialog.
    - Select an image file (`.jpg`, `.jpeg`, `.png`, `.bmp`).
 
-3. **View OCR Results:**
+3. **Take a Screenshot:**
+
+   - Click the "Take Screenshot" button.
+   - The application hides itself, captures the primary display the same way the UiaDriver Server does, and shows the result.
+
+4. **Inspect a Running Driver:**
+
+   - Type the address of the UiaDriver Server in the address box. The default is `http://localhost:5555`.
+   - Click the "From Driver" button.
+   - The application hides itself and shows the screenshot and the words that the server recognized.
+   - This needs the `-emgu` build of the server. The standard build has no OCR.
+
+5. **View OCR Results:**
 
    - The application will display the image with recognized words highlighted.
-   - Hover over the highlighted words to see tooltips with OCR details.
-   - Right-click on the highlighted words to copy the OCR text to the clipboard.
+   - Hover over the highlighted words to see tooltips with the OCR locator and accuracy.
+   - Right-click on the highlighted words to copy the OCR locator to the clipboard.
+   - A word that appears more than once gets an occurrence, such as `ocr('Submit')[2]`.
+
+## Staying in Step with the UiaDriver Server
+
+The files in `src/OcrInspector/Driver` are exact copies of files in the [UiaDriver Server](https://github.com/g4-api/uia-driver-server) repository. They hold the recognition code and the locator rules. When one of them changes in the server, copy it here again.
+
+| File here | File in the server repository |
+| --- | --- |
+| `Driver/OcrEngine.cs` | `src/Uia.DriverServer.Domain/OcrEngine.cs` |
+| `Driver/OcrLocator.cs` | `src/Uia.DriverServer.Domain/OcrLocator.cs` |
+| `Driver/OcrModels.cs` | `src/Uia.DriverServer.Models/OcrModels.cs` |
+| `Driver/RectangleModel.cs` | `src/Uia.DriverServer.Models/RectangleModel.cs` |
+
+Both projects must use the same Emgu.CV version and the same `TrainData/eng.traineddata` file. A different version can recognize small text differently.
 
 ## License
 
